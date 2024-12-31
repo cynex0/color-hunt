@@ -43,7 +43,7 @@ import com.cynex.colorhunt.core.ColorChangeListener
 import kotlin.math.min
 
 @Composable
-fun CameraPreviewScreen(averagingZone: Float) {
+fun CameraView(averagingZone: Float) {
     val currentColor = remember { mutableStateOf<String?>(null) }
     val colorChangeListener = object: ColorChangeListener {
         override fun onColorChanged(color: String?) {

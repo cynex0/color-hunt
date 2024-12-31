@@ -22,7 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import com.cynex.colorhunt.composables.CameraPreviewScreen
+import com.cynex.colorhunt.composables.CameraView
 
 class MainActivity : ComponentActivity() {
     private val averagingZone = 0.1f
@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    CameraPreviewScreen(averagingZone)
+                    CameraView(averagingZone)
                 }
             }
         }
