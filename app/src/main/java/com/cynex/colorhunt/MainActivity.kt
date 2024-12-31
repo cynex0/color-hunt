@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.cynex.colorhunt.composables.CameraView
 
 class MainActivity : ComponentActivity() {
-    private val averagingZone = 0.1f
+    private val averagingZone = 0.08f
 
     private val cameraPermissionRequest =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
