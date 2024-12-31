@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.app.cmrxtutorial.composables.CameraPreviewScreen
 
 class MainActivity : ComponentActivity() {
+    private val currentColor = "#000000"
     private val cameraPermissionRequest =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             isGranted ->
@@ -64,9 +65,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setCameraPreview() {
+
         setContent {
             ColorHuntTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
