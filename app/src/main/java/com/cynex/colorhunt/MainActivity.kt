@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import com.cynex.colorhunt.composables.CameraPreviewScreen
 
 class MainActivity : ComponentActivity() {
+    private val averagingZone = 0.1f
+
     private val cameraPermissionRequest =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             isGranted ->
@@ -60,7 +62,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    CameraPreviewScreen()
+                    CameraPreviewScreen(averagingZone)
                 }
             }
         }
