@@ -1,7 +1,7 @@
 package com.cynex.colorhunt.composables
 
-import android.provider.CalendarContract.Colors
 import android.util.Log
+import android.view.ScaleGestureDetector
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -194,22 +194,37 @@ fun ColorAnalyzerPreviewView(colorAnalyzer: ColorAnalyzer) {
                     scaleType = PreviewView.ScaleType.FILL_CENTER
                     implementationMode = PreviewView.ImplementationMode.COMPATIBLE
                 }.also { previewView ->
-                    previewView.controller = cameraController
-
                     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
                     cameraProviderFuture.addListener({
                         val cameraProvider = cameraProviderFuture.get()
                         val preview = Preview.Builder().build().also {
                             it.surfaceProvider = previewView.surfaceProvider
                         }
+                        previewView.controller = cameraController
                         try {
                             cameraProvider.unbindAll()
-                            cameraProvider.bindToLifecycle(
+                            val camera = cameraProvider.bindToLifecycle(
                                 lifecycleOwner,
                                 CameraSelector.DEFAULT_BACK_CAMERA,
                                 preview,
                                 imageAnalysis
                             )
+
+                            val scaleGestureDetector = ScaleGestureDetector(context,
+                                object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                                    override fun onScale(detector: ScaleGestureDetector): Boolean {
+                                        val currentZoomRatio = camera.cameraInfo.zoomState.value!!.zoomRatio
+                                        val delta = detector.scaleFactor
+                                        camera.cameraControl.setZoomRatio(currentZoomRatio * delta)
+                                        Log.d("CameraPreview", "Scale factor: $delta, Zoom ratio: ${currentZoomRatio}, Set to: ${currentZoomRatio * delta}")
+                                        return true
+                                    }
+                                }
+                            )
+                            previewView.setOnTouchListener {_, event ->
+                                scaleGestureDetector.onTouchEvent(event)
+                                return@setOnTouchListener true
+                            }
                         } catch (e: Exception) {
                             Log.e("CameraPreview", "Use case binding failed", e)
                         }
