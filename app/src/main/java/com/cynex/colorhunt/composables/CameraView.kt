@@ -1,5 +1,6 @@
 package com.cynex.colorhunt.composables
 
+import android.provider.CalendarContract.Colors
 import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -27,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -62,7 +64,7 @@ fun CameraView(averagingZone: Float = 0.1f) {
 
     Scaffold { paddingValues: PaddingValues ->
         Column (
-            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            modifier = Modifier.padding(paddingValues),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         )
@@ -79,30 +81,7 @@ fun CameraView(averagingZone: Float = 0.1f) {
                 Bounds(averagingZone)
             }
 
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column (
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                )
-                {
-                    Text(text = "Current", textAlign = TextAlign.Center)
-                    ColorBox(color = currentColor.value ?: "#000000", showValue = true)
-                }
-                Column (
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                )
-                {
-                    Text(text = "Target", textAlign = TextAlign.Center)
-                    ColorBox(color = targetColor, showValue = false)
-                }
-            }
-            Text(text = "Delta: ${delta.value ?: "N/A"}")
+            ColorsCompare(currentColor, targetColor, delta)
         }
     }
 }
@@ -261,4 +240,32 @@ fun ColorBox(color: String, showValue: Boolean = false) {
             )
         }
     }
+}
+
+@Composable
+fun ColorsCompare(currentColor: MutableState<String?>, targetColor: String, delta: MutableState<Double?>) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column (
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        )
+        {
+            Text(text = "Current", textAlign = TextAlign.Center)
+            ColorBox(color = currentColor.value ?: "#000000")
+        }
+        Column (
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        )
+        {
+            Text(text = "Target", textAlign = TextAlign.Center)
+            ColorBox(color = targetColor, showValue = false)
+        }
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(text = "Delta: ${delta.value?: "N/A"}")
 }
