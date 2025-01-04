@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,19 +36,27 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.cynex.colorhunt.core.ColorAnalyzer
 import com.cynex.colorhunt.core.ColorChangeListener
+import com.cynex.colorhunt.core.calculateColorDelta
 import kotlin.math.min
 
+@androidx.compose.ui.tooling.preview.Preview
 @Composable
-fun CameraView(averagingZone: Float) {
+fun CameraView(averagingZone: Float = 0.1f) {
     val currentColor = remember { mutableStateOf<String?>(null) }
+    val targetColor = "#FFFFFF"
+    val delta = remember { mutableStateOf<Double?>(null) }
+
     val colorChangeListener = object: ColorChangeListener {
         override fun onColorChanged(color: String?) {
             currentColor.value = color
+            delta.value = currentColor.value?.let { calculateColorDelta(it, targetColor) }
+            // TODO: error message if null
         }
     }
 
@@ -70,14 +79,35 @@ fun CameraView(averagingZone: Float) {
                 Bounds(averagingZone)
             }
 
-            currentColor.value?.let {
-                Spacer(modifier = Modifier.height(16.dp))
-                ColorBox(color = it)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column (
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                )
+                {
+                    Text(text = "Current", textAlign = TextAlign.Center)
+                    ColorBox(color = currentColor.value ?: "#000000", showValue = true)
+                }
+                Column (
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                )
+                {
+                    Text(text = "Target", textAlign = TextAlign.Center)
+                    ColorBox(color = targetColor, showValue = false)
+                }
             }
+            Text(text = "Delta: ${delta.value ?: "N/A"}")
         }
     }
 }
 
+@androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun Crosshair() {
     Canvas(
@@ -211,20 +241,24 @@ fun ColorAnalyzerPreviewView(colorAnalyzer: ColorAnalyzer) {
 }
 
 @Composable
-fun ColorBox(color: String) {
+fun ColorBox(color: String, showValue: Boolean = false) {
     Box(
         modifier = Modifier
-            .padding(16.dp)
-            .width(180.dp)
+            .padding(8.dp)
+            .width(160.dp)
+            .height(70.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Color(android.graphics.Color.parseColor(color)))
             .wrapContentSize(Alignment.Center)
     ) {
-        Text(
-            text = color,
-            modifier = Modifier.padding(16.dp),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        if (showValue) {
+            Text(
+                text = color,
+                modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }

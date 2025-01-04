@@ -6,6 +6,9 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import java.nio.ByteBuffer
 import kotlin.math.max
 import kotlin.math.min
@@ -66,7 +69,7 @@ class ColorAnalyzer(private val listener: ColorChangeListener, private val avera
     }
 }
 
-private fun calculateColorDelta(a: Triple<Int, Int, Int>, b: Triple<Int, Int, Int>): Double {
+fun calculateColorDelta(a: Triple<Int, Int, Int>, b: Triple<Int, Int, Int>): Double {
     val color1 = DoubleArray(3)
     ColorUtils.RGBToLAB(a.first, a.second, a.third, color1)
     val color2 = DoubleArray(3)
@@ -76,6 +79,12 @@ private fun calculateColorDelta(a: Triple<Int, Int, Int>, b: Triple<Int, Int, In
     val deltaA = color1[1] - color2[1]
     val deltaB = color1[2] - color2[2]
     return sqrt(deltaL * deltaL + deltaA * deltaA + deltaB * deltaB)
+}
+
+fun calculateColorDelta(a: String, b: String): Double {
+    val color1 = android.graphics.Color.parseColor(a)
+    val color2 = android.graphics.Color.parseColor(b)
+    return calculateColorDelta(Triple(color1.red, color1.green, color1.blue), Triple(color2.red, color2.green, color2.blue))
 }
 
 interface ColorChangeListener {
