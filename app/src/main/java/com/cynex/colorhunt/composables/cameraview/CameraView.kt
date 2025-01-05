@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cynex.colorhunt.core.ColorAnalyzer
@@ -124,11 +125,12 @@ fun ColorBox(color: String?, showValue: Boolean = false) {
             .wrapContentSize(Alignment.Center)
     ) {
         if (showValue) {
+            val textColor = if (bgColor.luminance() > 0.5) Color.Black else Color.White
             Text(
                 text = color ?: "N/A",
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = textColor,
                 textAlign = TextAlign.Center
             )
         }
