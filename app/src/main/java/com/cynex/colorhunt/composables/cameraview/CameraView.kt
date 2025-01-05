@@ -41,7 +41,6 @@ import com.cynex.colorhunt.core.coloranalyzer.PowerWeightedAveraging
 import com.cynex.colorhunt.core.coloranalyzer.calculateColorDelta
 import com.cynex.colorhunt.core.coloranalyzer.toRgb255
 
-@androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun CameraView(averagingZone: Float = 0.1f) {
     val currentColor = remember { mutableStateOf<Color?>(null) }
