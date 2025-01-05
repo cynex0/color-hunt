@@ -13,7 +13,7 @@ class ColorAnalyzer(private val listener: ColorChangeListener, private val avera
 
     override fun analyze(image: ImageProxy) {
         if (image.format != PixelFormat.RGBA_8888) {
-            Log.e("ColorAnalyzer", "Unsupported image format: ${image.format}")
+            Log.e("ColorAnalyzer", "Unsupported image format: ${image.format}. RGBA_8888 expected")
             image.close()
             return
         }
@@ -25,22 +25,19 @@ class ColorAnalyzer(private val listener: ColorChangeListener, private val avera
 
         val centerX = image.width / 2
         val centerY = image.height / 2
+        val center = Pair(centerX, centerY)
 
-        val windowSize = (minOf(image.width, image.height) * averagingZone).toInt()
-        val halfWindow = windowSize / 2
-        val startX = max(0, centerX - halfWindow)
-        val endX = min(image.width, centerX + halfWindow)
-        val startY = max(0, centerY - halfWindow)
-        val endY = min(image.height, centerY + halfWindow)
+        val windowRadius = (minOf(image.width, image.height) * averagingZone).toInt()
 
         var rTotal = 0;
         var gTotal = 0;
         var bTotal = 0;
         var pixelCount = 0;
 
-        for (y in startY until endY) {
-            for (x in startX until endX) {
+        for (y in centerY - windowRadius until centerY + windowRadius) {
+            for (x in centerX - windowRadius until centerX + windowRadius) {
                 val pixelIndex = pixelStride * x + rowStride * y
+                if (calculateEuclideanDistance(center, Pair(x, y)) > windowRadius) continue
 
                 rTotal += buffer.get(pixelIndex).toInt() and 0xFF
                 gTotal += buffer.get(pixelIndex + 1).toInt() and 0xFF

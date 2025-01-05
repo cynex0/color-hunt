@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import kotlin.math.min
 
@@ -36,7 +38,25 @@ fun Crosshair() {
 }
 
 @Composable
-fun Bounds(averagingZone: Float) {
+fun CircleBound(averagingZone: Float) {
+    Canvas(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        val centerX = size.width / 2
+        val centerY = size.height / 2
+        val radius = min(size.width, size.height) * averagingZone
+
+        drawCircle(
+            color = Color.White,
+            radius,
+            center = Offset(centerX, centerY),
+            style = Stroke(width = 1F)
+        )
+    }
+}
+
+@Composable
+fun SquareBounds(averagingZone: Float) {
     Canvas(
         modifier = Modifier.fillMaxSize()
     ) {

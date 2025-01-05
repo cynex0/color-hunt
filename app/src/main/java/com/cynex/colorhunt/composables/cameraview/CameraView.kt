@@ -64,7 +64,7 @@ fun CameraView(averagingZone: Float = 0.1f) {
                     colorAnalyzer = ColorAnalyzer(colorChangeListener, averagingZone)
                 )
                 Crosshair()
-                Bounds(averagingZone)
+                CircleBound(averagingZone)
             }
 
             ColorsCompare(currentColor, targetColor, delta)
