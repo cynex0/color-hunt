@@ -32,18 +32,20 @@ import androidx.compose.ui.unit.dp
 import com.cynex.colorhunt.core.coloranalyzer.ColorAnalyzer
 import com.cynex.colorhunt.core.coloranalyzer.ColorChangeListener
 import com.cynex.colorhunt.core.coloranalyzer.calculateColorDelta
+import com.cynex.colorhunt.core.coloranalyzer.toRgb255
 
 @androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun CameraView(averagingZone: Float = 0.1f) {
-    val currentColor = remember { mutableStateOf<String?>(null) }
-    val targetColor = "#FFFFFF"
+    val currentColor = remember { mutableStateOf<Color?>(null) }
+    val targetColor = Color(255, 255, 255)
     val delta = remember { mutableStateOf<Double?>(null) }
 
     val colorChangeListener = object: ColorChangeListener {
-        override fun onColorChanged(color: String?) {
+        override fun onColorChanged(color: Color) {
             currentColor.value = color
             delta.value = currentColor.value?.let { calculateColorDelta(it, targetColor) }
+            // Log.d("ColorAnalyzer", "Color changed: ${currentColor.value}")
             // TODO: error message if null
         }
     }
@@ -75,7 +77,7 @@ fun CameraView(averagingZone: Float = 0.1f) {
 
 
 @Composable
-fun ColorsCompare(currentColor: MutableState<String?>, targetColor: String, delta: MutableState<Double?>) {
+fun ColorsCompare(currentColor: MutableState<Color?>, targetColor: Color, delta: MutableState<Double?>) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -89,7 +91,7 @@ fun ColorsCompare(currentColor: MutableState<String?>, targetColor: String, delt
 }
 
 @Composable
-fun ColorBoxTitled(color: String?, title: String) {
+fun ColorBoxTitled(color: Color?, title: String) {
     Column (
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -101,18 +103,18 @@ fun ColorBoxTitled(color: String?, title: String) {
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
-        ColorBox(color)
+        ColorBox(color, true)
    }
 }
 
 @Composable
-fun ColorBox(color: String?, showValue: Boolean = false) {
+fun ColorBox(color: Color?, showValue: Boolean = false) {
     val bgColor: Color
     if (color == null) {
         Log.e("ColorBox", "Invalid color")
         bgColor = Color.Black
     } else {
-        bgColor = Color(android.graphics.Color.parseColor(color))
+        bgColor = color
     }
 
     Box(
@@ -126,8 +128,9 @@ fun ColorBox(color: String?, showValue: Boolean = false) {
     ) {
         if (showValue) {
             val textColor = if (bgColor.luminance() > 0.5) Color.Black else Color.White
+            val rgbValues = color?.toRgb255()
             Text(
-                text = color ?: "N/A",
+                text = if (rgbValues != null) String.format("#%02x%02x%02x", rgbValues.first, rgbValues.second, rgbValues.third) else "N/A",
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyMedium,
                 color = textColor,
