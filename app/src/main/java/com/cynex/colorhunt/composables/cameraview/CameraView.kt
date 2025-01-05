@@ -29,9 +29,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.cynex.colorhunt.core.ColorAnalyzer
-import com.cynex.colorhunt.core.ColorChangeListener
-import com.cynex.colorhunt.core.calculateColorDelta
+import com.cynex.colorhunt.core.coloranalyzer.ColorAnalyzer
+import com.cynex.colorhunt.core.coloranalyzer.ColorChangeListener
+import com.cynex.colorhunt.core.coloranalyzer.calculateColorDelta
 
 @androidx.compose.ui.tooling.preview.Preview
 @Composable

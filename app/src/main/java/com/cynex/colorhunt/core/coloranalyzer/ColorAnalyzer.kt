@@ -1,21 +1,15 @@
-package com.cynex.colorhunt.core
+package com.cynex.colorhunt.core.coloranalyzer
 
 import android.graphics.PixelFormat
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import androidx.compose.ui.graphics.Color
-import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.blue
-import androidx.core.graphics.green
-import androidx.core.graphics.red
 import java.nio.ByteBuffer
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sqrt
 
 class ColorAnalyzer(private val listener: ColorChangeListener, private val averagingZone: Float): ImageAnalysis.Analyzer {
-    var prevColor: Triple<Int,Int,Int>? = null
+    private var prevColor: Triple<Int,Int,Int>? = null
 
     override fun analyze(image: ImageProxy) {
         if (image.format != PixelFormat.RGBA_8888) {
@@ -69,23 +63,6 @@ class ColorAnalyzer(private val listener: ColorChangeListener, private val avera
     }
 }
 
-fun calculateColorDelta(a: Triple<Int, Int, Int>, b: Triple<Int, Int, Int>): Double {
-    val color1 = DoubleArray(3)
-    ColorUtils.RGBToLAB(a.first, a.second, a.third, color1)
-    val color2 = DoubleArray(3)
-    ColorUtils.RGBToLAB(b.first, b.second, b.third, color2)
-
-    val deltaL = color1[0] - color2[0]
-    val deltaA = color1[1] - color2[1]
-    val deltaB = color1[2] - color2[2]
-    return sqrt(deltaL * deltaL + deltaA * deltaA + deltaB * deltaB)
-}
-
-fun calculateColorDelta(a: String, b: String): Double {
-    val color1 = android.graphics.Color.parseColor(a)
-    val color2 = android.graphics.Color.parseColor(b)
-    return calculateColorDelta(Triple(color1.red, color1.green, color1.blue), Triple(color2.red, color2.green, color2.blue))
-}
 
 interface ColorChangeListener {
     fun onColorChanged(color: String?)

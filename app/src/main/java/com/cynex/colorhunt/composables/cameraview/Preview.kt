@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.cynex.colorhunt.core.ColorAnalyzer
+import com.cynex.colorhunt.core.coloranalyzer.ColorAnalyzer
 
 @Composable
 fun ColorAnalyzerPreviewView(colorAnalyzer: ColorAnalyzer) {
