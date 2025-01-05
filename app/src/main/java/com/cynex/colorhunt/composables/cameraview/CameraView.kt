@@ -97,18 +97,18 @@ fun ColorBoxTitled(color: String?, title: String) {
         Text(
             text = title,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
         ColorBox(color)
-    }
+   }
 }
 
 @Composable
 fun ColorBox(color: String?, showValue: Boolean = false) {
     val bgColor: Color
     if (color == null) {
-        Log.e("ColorBox", "Invalid color: $color")
+        Log.e("ColorBox", "Invalid color")
         bgColor = Color.Black
     } else {
         bgColor = Color(android.graphics.Color.parseColor(color))
@@ -127,7 +127,7 @@ fun ColorBox(color: String?, showValue: Boolean = false) {
             Text(
                 text = color ?: "N/A",
                 modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center
             )
