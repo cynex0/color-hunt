@@ -6,10 +6,8 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
@@ -20,7 +18,6 @@ import com.cynex.colorhunt.core.ColorAnalyzer
 fun ColorAnalyzerPreviewView(colorAnalyzer: ColorAnalyzer) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val cameraController = remember { LifecycleCameraController(context) }
 
     AndroidView(
         factory = {
@@ -28,7 +25,7 @@ fun ColorAnalyzerPreviewView(colorAnalyzer: ColorAnalyzer) {
                 scaleType = PreviewView.ScaleType.FILL_CENTER
                 implementationMode = PreviewView.ImplementationMode.COMPATIBLE
             }.also { previewView ->
-                setupPreviewView(previewView, context, lifecycleOwner, cameraController, colorAnalyzer)
+                setupPreviewView(previewView, context, lifecycleOwner, colorAnalyzer)
             }
         },
     )
@@ -38,21 +35,18 @@ private fun setupPreviewView(
     previewView: PreviewView,
     context: android.content.Context,
     lifecycleOwner: androidx.lifecycle.LifecycleOwner,
-    cameraController: LifecycleCameraController,
     analyzer: ImageAnalysis.Analyzer
 ) {
     val imageAnalysis = ImageAnalysis.Builder()
         .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
         .build()
-        .also {
-            it.setAnalyzer(
+        .apply {
+            setAnalyzer(
                 ContextCompat.getMainExecutor(context),
                 analyzer
             )
         }
-
-    previewView.controller = cameraController
 
     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
     cameraProviderFuture.addListener({
@@ -75,13 +69,17 @@ private fun setupPreviewView(
                         val currentZoomRatio = camera.cameraInfo.zoomState.value!!.zoomRatio
                         val delta = detector.scaleFactor
                         camera.cameraControl.setZoomRatio(currentZoomRatio * delta)
-                        Log.d("CameraPreview", "Scale factor: $delta, Zoom ratio: ${currentZoomRatio}, Set to: ${currentZoomRatio * delta}")
+                        // Log.d("CameraPreview", "Scale factor: $delta, Zoom ratio: ${currentZoomRatio}, Set to: ${currentZoomRatio * delta}")
                         return true
                     }
                 }
             )
+
             previewView.setOnTouchListener {_, event ->
                 scaleGestureDetector.onTouchEvent(event)
+                if (event.action == android.view.MotionEvent.ACTION_UP) {
+                    previewView.performClick()
+                }
                 return@setOnTouchListener true
             }
         } catch (e: Exception) {
