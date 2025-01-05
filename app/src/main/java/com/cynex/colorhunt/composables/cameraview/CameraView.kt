@@ -15,11 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -29,8 +32,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.cynex.colorhunt.core.coloranalyzer.AveragingStrategy
 import com.cynex.colorhunt.core.coloranalyzer.ColorAnalyzer
 import com.cynex.colorhunt.core.coloranalyzer.ColorChangeListener
+import com.cynex.colorhunt.core.coloranalyzer.GaussianWeightedAveraging
+import com.cynex.colorhunt.core.coloranalyzer.LinearAveraging
+import com.cynex.colorhunt.core.coloranalyzer.PowerWeightedAveraging
 import com.cynex.colorhunt.core.coloranalyzer.calculateColorDelta
 import com.cynex.colorhunt.core.coloranalyzer.toRgb255
 
@@ -40,6 +47,18 @@ fun CameraView(averagingZone: Float = 0.1f) {
     val currentColor = remember { mutableStateOf<Color?>(null) }
     val targetColor = Color(255, 255, 255)
     val delta = remember { mutableStateOf<Double?>(null) }
+
+    val strategyIndex = remember { mutableIntStateOf(0) }
+    val strategies: List<AveragingStrategy> =
+        listOf(
+            LinearAveraging(),
+            PowerWeightedAveraging(2),
+            PowerWeightedAveraging(3),
+            PowerWeightedAveraging(4),
+            GaussianWeightedAveraging(2.0),
+            GaussianWeightedAveraging(3.0),
+            GaussianWeightedAveraging(4.0)
+        )
 
     val colorChangeListener = object: ColorChangeListener {
         override fun onColorChanged(color: Color) {
@@ -62,14 +81,22 @@ fun CameraView(averagingZone: Float = 0.1f) {
                 .weight(1f)
                 .aspectRatio(4f / 3f),
             ) {
-                ColorAnalyzerPreviewView(
-                    colorAnalyzer = ColorAnalyzer(colorChangeListener, averagingZone)
-                )
+                key(strategyIndex.intValue) {
+                    ColorAnalyzerPreviewView(
+                        colorAnalyzer = ColorAnalyzer(colorChangeListener, averagingZone, strategies[strategyIndex.intValue])
+                    )
+                }
                 Crosshair()
                 CircleBound(averagingZone)
             }
 
             ColorsCompare(currentColor, targetColor, delta)
+            Button(onClick = {
+                strategyIndex.intValue = (strategyIndex.intValue + 1) % strategies.size
+                Log.d("CameraView", "Strategy changed to: ${strategies[strategyIndex.intValue]}")
+            }) {
+                Text(strategyIndex.intValue.toString())
+            }
         }
     }
 }
