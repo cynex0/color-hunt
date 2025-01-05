@@ -1,6 +1,7 @@
 package com.cynex.colorhunt.composables.cameraview
 
 import android.util.Log
+import android.view.ScaleGestureDetector
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -61,12 +62,28 @@ private fun setupPreviewView(
         }
         try {
             cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(
+            val camera = cameraProvider.bindToLifecycle(
                 lifecycleOwner,
                 CameraSelector.DEFAULT_BACK_CAMERA,
                 preview,
                 imageAnalysis
             )
+
+            val scaleGestureDetector = ScaleGestureDetector(context,
+                object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                    override fun onScale(detector: ScaleGestureDetector): Boolean {
+                        val currentZoomRatio = camera.cameraInfo.zoomState.value!!.zoomRatio
+                        val delta = detector.scaleFactor
+                        camera.cameraControl.setZoomRatio(currentZoomRatio * delta)
+                        Log.d("CameraPreview", "Scale factor: $delta, Zoom ratio: ${currentZoomRatio}, Set to: ${currentZoomRatio * delta}")
+                        return true
+                    }
+                }
+            )
+            previewView.setOnTouchListener {_, event ->
+                scaleGestureDetector.onTouchEvent(event)
+                return@setOnTouchListener true
+            }
         } catch (e: Exception) {
             Log.e("CameraPreview", "Use case binding failed", e)
         }
