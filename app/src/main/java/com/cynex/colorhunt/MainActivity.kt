@@ -22,7 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import com.cynex.colorhunt.composables.CameraView
+import com.cynex.colorhunt.composables.cameraview.CameraView
 
 class MainActivity : ComponentActivity() {
     private val averagingZone = 0.08f
